@@ -20,6 +20,7 @@ export const updateProfile = (id, updateData) => async (dispatch) => {
 export const followUser = (userId) => async (dispatch) => {
   try {
     await api.followUser(userId);
+    dispatch(fetchAllUsers());
   } catch (error) {
     console.log(error);
   }
@@ -28,6 +29,7 @@ export const followUser = (userId) => async (dispatch) => {
 export const unfollowUser = (userId) => async (dispatch) => {
   try {
     await api.unfollowUser(userId);
+    dispatch(fetchAllUsers());
   } catch (error) {
     console.log(error);
   }

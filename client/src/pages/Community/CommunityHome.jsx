@@ -5,6 +5,7 @@ import Logo from "../../assets/icon.png";
 import AboutCommunity from "./AboutCommunity";
 import Post from "../../components/Post/Post";
 import { GrAdd, GrClose } from "react-icons/gr";
+import { RxCross1 } from "react-icons/rx";
 import Modal from "react-modal";
 import app from "../../firebase";
 import {
@@ -16,15 +17,15 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { fetchAllPosts, sharePost } from "../../actions/post";
 import SuggestionBox from "../../components/SuggestionBox/SuggestionBox";
+import Preview from "../../assets/img-preview.jpg";
 
 const CommunityHome = () => {
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [allPosts, setAllPosts] = useState([]);
   const PostsList = useSelector((state) => state.postReducer);
+  const currentUser = useSelector((state) => state.currentUserReducer);
   const [refresh, setRefresh] = useState(true);
-  useEffect(() => {
-    setAllPosts(PostsList.data);
-  }, [refresh, PostsList]);
+  const [activeTab, setActiveTab] = useState("post");
+
   return (
     <div className="community-container">
       <ModelBox
@@ -33,9 +34,16 @@ const CommunityHome = () => {
         setRefresh={setRefresh}
         refresh={refresh}
       />
-      <div className="add-post-button" onClick={() => setIsOpen(true)}>
-        <GrAdd className="add-button" />
-      </div>
+      {currentUser &&
+        (!modalIsOpen ? (
+          <div className="add-post-button" onClick={() => setIsOpen(true)}>
+            <GrAdd className="add-button" />
+          </div>
+        ) : (
+          <div className="add-post-button" onClick={() => setIsOpen(false)}>
+            <RxCross1 className="add-button" />
+          </div>
+        ))}
       <div className="wrapper">
         <div className="community-poster">
           <img src={Poster} alt="" />
@@ -47,22 +55,59 @@ const CommunityHome = () => {
           <span className="title">Stack Overflow Community</span>
         </div>
         <div className="tab-bar">
-          <span>Posts</span>
-          <span>Videos</span>
-          <span>About</span>
+          <span
+            className={activeTab === "post" && "active-tab"}
+            onClick={() => setActiveTab("post")}
+          >
+            Posts
+          </span>
+          <span
+            className={activeTab === "video" && "active-tab"}
+            onClick={() => setActiveTab("video")}
+          >
+            Videos
+          </span>
+          <span
+            className={
+              activeTab === "about" ? "about-tab active-tab" : "about-tab"
+            }
+            onClick={() => setActiveTab("about")}
+          >
+            About
+          </span>
         </div>
         {/* --- posts --- */}
-        <div className="community-body">
-          <div className="left-sidebar">
+        {activeTab === "post" || activeTab === "video" ? (
+          <div className="community-body">
+            <div className="left-sidebar">
+              <AboutCommunity />
+              <SuggestionBox />
+            </div>
+            <div className="posts">
+              {activeTab === "post" &&
+                PostsList.data?.map((post) => {
+                  return <Post post={post} key={post._id} />;
+                })}
+              {activeTab === "video" &&
+                PostsList.data
+                  ?.filter(
+                    (item) =>
+                      ((item.videoUrl != undefined || item.videoUrl != null) &&
+                        item.desc !== "") ||
+                      ((item.videoUrl != undefined || item.videoUrl != null) &&
+                        item.desc === "")
+                  )
+                  .map((post) => {
+                    return <Post post={post} key={post._id} />;
+                  })}
+            </div>
+          </div>
+        ) : (
+          <div className="community-about-body">
             <AboutCommunity />
             <SuggestionBox />
           </div>
-          <div className="posts">
-            {allPosts?.map((post) => {
-              return <Post post={post} key={post._id} />;
-            })}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -88,13 +133,8 @@ export const ModelBox = ({ modalIsOpen, setIsOpen, setRefresh, refresh }) => {
   const [imagePerc, setImagePerc] = useState(0);
   const [desc, setDesc] = useState("");
   const [fileUrl, setFileUrl] = useState(null);
+  const currentUser = useSelector((state) => state.currentUserReducer);
   const dispatch = useDispatch();
-
-  let subtitle;
-  function afterOpenModal() {
-    // references are now sync'd and can be accessed.
-    subtitle.style.color = "#f00";
-  }
 
   function closeModal() {
     setIsOpen(false);
@@ -117,7 +157,6 @@ export const ModelBox = ({ modalIsOpen, setIsOpen, setRefresh, refresh }) => {
         urlType === "imageType"
           ? setImagePerc(Math.round(progress))
           : setVideoPerc(Math.round(progress));
-        console.log("Upload is " + progress + "% done");
         switch (snapshot.state) {
           case "paused":
             console.log("Upload is paused");
@@ -133,7 +172,6 @@ export const ModelBox = ({ modalIsOpen, setIsOpen, setRefresh, refresh }) => {
       () => {
         // Upload completed successfully, now we can get the download URL
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log("File available at", downloadURL);
           setFileUrl(downloadURL);
         });
       }
@@ -141,20 +179,28 @@ export const ModelBox = ({ modalIsOpen, setIsOpen, setRefresh, refresh }) => {
   };
 
   useEffect(() => {
-    imageFile && uploadFile(imageFile, "imageType");
-    setVideoFile(null);
-    setVideoPerc(0);
+    if (currentUser) {
+      imageFile && uploadFile(imageFile, "imageType");
+      setVideoFile(null);
+      setVideoPerc(0);
+    }
   }, [imageFile]);
 
   useEffect(() => {
-    videoFile && uploadFile(videoFile, "videoType");
-    setImageFile(null);
-    setImagePerc(0);
+    if (currentUser) {
+      videoFile && uploadFile(videoFile, "videoType");
+      setImageFile(null);
+      setImagePerc(0);
+    }
   }, [videoFile]);
 
   const handleSubmitImage = async (e) => {
     e.preventDefault();
-    dispatch(sharePost({ desc, imageUrl: fileUrl }));
+    if (currentUser) {
+      dispatch(sharePost({ desc, imageUrl: fileUrl }));
+    } else {
+      alert("Please login");
+    }
     setIsOpen(false);
     dispatch(fetchAllPosts());
     setRefresh(!refresh);
@@ -162,7 +208,11 @@ export const ModelBox = ({ modalIsOpen, setIsOpen, setRefresh, refresh }) => {
 
   const handleSubmitVideo = async (e) => {
     e.preventDefault();
-    dispatch(sharePost({ desc, videoUrl: fileUrl }));
+    if (currentUser) {
+      dispatch(sharePost({ desc, videoUrl: fileUrl }));
+    } else {
+      alert("Please login");
+    }
     setIsOpen(false);
     dispatch(fetchAllPosts());
     setRefresh(!refresh);
@@ -171,7 +221,6 @@ export const ModelBox = ({ modalIsOpen, setIsOpen, setRefresh, refresh }) => {
   return (
     <Modal
       isOpen={modalIsOpen}
-      onAfterOpen={afterOpenModal}
       onRequestClose={closeModal}
       style={customStyles}
       contentLabel="Example Modal"
@@ -179,7 +228,7 @@ export const ModelBox = ({ modalIsOpen, setIsOpen, setRefresh, refresh }) => {
       <div className="sharepost-container">
         <GrClose className="close-icon" onClick={closeModal} />
         <div className="wrapper">
-          <div className="title">Create Post</div>
+          <h4 className="title">Create Post</h4>
           <form
             action=""
             onSubmit={imagePerc > 0 ? handleSubmitImage : handleSubmitVideo}
@@ -191,34 +240,64 @@ export const ModelBox = ({ modalIsOpen, setIsOpen, setRefresh, refresh }) => {
               rows="10"
               placeholder="Type something..."
               value={desc}
+              maxLength="1500"
               onChange={(e) => setDesc(e.target.value)}
             ></textarea>
             <div className="share-buttons">
               <div className="upload-button">
-                <button>Upload Image</button>
-                {imagePerc > 0 ? (
-                  "Uploading: " + imagePerc + "%"
-                ) : (
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setImageFile(e.target.files[0])}
-                  />
-                )}
+                <label htmlFor="imageFile">
+                  {imagePerc > 0
+                    ? "Uploading " + imagePerc + "%"
+                    : "Upload Image"}
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImageFile(e.target.files[0])}
+                  id="imageFile"
+                />
               </div>
+              <span style={{ margin: "10px" }}>or</span>
               <div className="upload-button">
-                <button>Upload Video</button>
-                {videoPerc > 0 ? (
-                  "Uploading: " + videoPerc + "%"
-                ) : (
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={(e) => setVideoFile(e.target.files[0])}
-                  />
-                )}
+                <label htmlFor="videoFile">
+                  {videoPerc > 0
+                    ? "Uploading " + videoPerc + "%"
+                    : "Upload Video"}
+                </label>
+
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => setVideoFile(e.target.files[0])}
+                  id="videoFile"
+                />
               </div>
             </div>
+            {fileUrl ? (
+              imagePerc > 0 ? (
+                <img
+                  src={fileUrl}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    maxHeight: "200px",
+                    objectFit: "contain",
+                  }}
+                />
+              ) : (
+                <video src={fileUrl} alt="" />
+              )
+            ) : (
+              <img
+                src={Preview}
+                alt=""
+                style={{
+                  width: "100%",
+                  maxHeight: "200px",
+                  objectFit: "contain",
+                }}
+              />
+            )}
             <button type="submit">Share</button>
           </form>
         </div>

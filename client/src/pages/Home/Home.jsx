@@ -21,7 +21,7 @@ const Home = () => {
           <BsChatSquare className="comment-button" />
         </div>
       )}
-      {BotIsOpen && <Chatbot />}
+      {BotIsOpen && <Chatbot setBotIsOpen={setBotIsOpen} />}
       <LeftSidebar />
       <div className="home-container-2">
         <HomeMainbar />

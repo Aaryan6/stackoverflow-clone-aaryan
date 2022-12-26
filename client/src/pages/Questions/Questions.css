@@ -1,7 +1,7 @@
 .question-details-page {
   width: calc(100% - 300px - 24px);
   float: left;
-  margin: 25px 0px;
+  margin: 25px 0;
   padding: 0px;
 }
 
@@ -38,6 +38,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .question-details-container .question-details-tags p,
@@ -122,4 +123,17 @@
   font-size: 14px;
   line-height: 18px;
   white-space: pre-line;
+}
+
+@media screen and (max-width: 1100px) {
+  .question-details-page {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .question-details-page {
+    width: calc(100% - 40px);
+    padding: 0 20px;
+  }
 }

@@ -2,7 +2,7 @@ import Post from "../models/Post.js";
 
 export const getPosts = async (req, res) => {
   try {
-    const isPost = await Post.find().sort({ updatedAt: -1 });
+    const isPost = await Post.find().sort({ createdAt: -1 });
     res.status(200).json(isPost);
   } catch (error) {
     res.status(500).json(error);
@@ -12,7 +12,7 @@ export const getPosts = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const posts = await Post.find({ userId: req.params.id }).sort({
-      updatedAt: -1,
+      createdAt: -1,
     });
     res.status(200).json(posts);
   } catch (error) {
@@ -70,6 +70,24 @@ export const dislike = async (req, res) => {
       req.params.id,
       {
         $pull: { likes: req.userId },
+      },
+      { new: true }
+    );
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export const commentPost = async (req, res) => {
+  const { comment } = req.body;
+  try {
+    const post = await Post.findByIdAndUpdate(
+      req.params.id,
+      {
+        $addToSet: {
+          comments: { userId: req.userId, comment },
+        },
       },
       { new: true }
     );

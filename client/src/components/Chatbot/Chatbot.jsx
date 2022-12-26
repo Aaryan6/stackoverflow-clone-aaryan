@@ -5,11 +5,11 @@ import { FiChevronDown } from "react-icons/fi";
 import { IoSend } from "react-icons/io5";
 import Logo from "../../assets/icon.png";
 
-const Chatbot = () => {
+const Chatbot = ({ setBotIsOpen }) => {
   const [chats, setChats] = useState([
     {
       id: 212,
-      text: "Hi, What you want to ask?",
+      text: "Hi, want to ask about programming?",
       sender: "robot",
     },
   ]);
@@ -23,11 +23,12 @@ const Chatbot = () => {
   const openai = new OpenAIApi(configuration);
 
   useEffect(() => {
-    console.log(process.env.REACT_APP_OPENAI_API_KEY);
     boxRef.current.scrollTo(-20, 10000000000);
   }, [chats]);
 
-  const sendMessage = async () => {
+  const sendMessage = async (e) => {
+    console.log(process.env.REACT_APP_OPENAI_API_KEY);
+    e.preventDefault();
     setChats((prev) => [
       ...prev,
       { id: Date.now(), text: input, sender: "user" },
@@ -50,7 +51,7 @@ const Chatbot = () => {
       ...prev,
       { id: Date.now(), text: response.data.choices[0].text, sender: "robot" },
     ]);
-    console.log(response.data.choices);
+    console.log(response);
   };
   return (
     <div className="chatbot-outer">
@@ -62,7 +63,7 @@ const Chatbot = () => {
             </div>
             <span className="header-title">StackBot</span>
           </div>
-          <button>
+          <button onClick={() => setBotIsOpen(false)}>
             <FiChevronDown />
           </button>
         </div>
@@ -76,17 +77,20 @@ const Chatbot = () => {
           })}
           {typing && <span className="typing">Typing...</span>}
         </div>
-        <div className="footer">
-          <input
-            type="text"
-            placeholder="Type a message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <button onClick={sendMessage}>
-            <IoSend />
-          </button>
-        </div>
+        <form onSubmit={sendMessage}>
+          <div className="footer">
+            <input
+              type="text"
+              placeholder="Type a message..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              required
+            />
+            <button type="submit">
+              <IoSend />
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

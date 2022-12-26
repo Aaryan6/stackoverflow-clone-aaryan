@@ -83,3 +83,15 @@
   font-size: 13px;
   cursor: pointer;
 }
+
+#check {
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+}
+
+@media screen and (max-width: 900px) {
+  .auth-container-1 {
+    display: none;
+  }
+}

@@ -68,7 +68,7 @@ const LeftSidebar = () => {
         </div>
         <NavLink
           to="/product"
-          className="side-nav-links"
+          className="side-nav-links add-list-item"
           activeclassname="active"
           onClick={toggleSideBar}
         >
@@ -76,7 +76,7 @@ const LeftSidebar = () => {
         </NavLink>
         <NavLink
           to="/teams"
-          className="side-nav-links"
+          className="side-nav-links add-list-item"
           activeclassname="active"
           onClick={toggleSideBar}
         >
@@ -84,7 +84,7 @@ const LeftSidebar = () => {
         </NavLink>
         <NavLink
           to="/stackoverflow-community"
-          className="side-nav-links"
+          className="side-nav-links add-list-item"
           activeclassname="active"
           onClick={toggleSideBar}
         >

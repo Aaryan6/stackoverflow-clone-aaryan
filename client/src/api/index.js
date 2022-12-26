@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const API = axios.create({ baseURL: "http://localhost:5000" });
+// https://stackoverflow-clone-aaryan.onrender.com/"
+const API = axios.create({
+  baseURL: "https://stackoverflow-clone-aaryan.onrender.com/",
+});
 
 API.interceptors.request.use((req) => {
   if (localStorage.getItem("Profile")) {
@@ -42,3 +45,5 @@ export const getAllPosts = () => API.get("/post/");
 export const likePost = (postId) => API.put(`/post/like/${postId}`);
 export const dislikePost = (postId) => API.put(`/post/dislike/${postId}`);
 export const deletePost = (postId) => API.delete(`/post/${postId}`);
+export const commentPost = (postId, commentText) =>
+  API.put(`/post/comment/${postId}`, { comment: commentText });

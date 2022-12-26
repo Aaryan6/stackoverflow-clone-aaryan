@@ -10,6 +10,7 @@ import Tags from "./pages/Tags/Tags";
 import Users from "./pages/Users/Users";
 import UserProfile from "./pages/UserProfile/UserProfile";
 import CommunityHome from "./pages/Community/CommunityHome";
+import PostPage from "./pages/PostPage/PostPage";
 
 const AllRoutes = () => {
   return (
@@ -22,6 +23,7 @@ const AllRoutes = () => {
       <Route path="/Tags" element={<Tags />} />
       <Route path="/Users" element={<Users />} />
       <Route path="/Users/:id" element={<UserProfile />} />
+      <Route path="/stackoverflow-community/post/:id" element={<PostPage />} />
       <Route path="/stackoverflow-community" element={<CommunityHome />} />
     </Routes>
   );

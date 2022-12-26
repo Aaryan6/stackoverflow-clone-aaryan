@@ -137,3 +137,13 @@
   align-items: center;
   justify-content: center;
 }
+
+@media screen and (max-width: 600px) {
+  .chatbox-container {
+    border: 1px solid rgb(191, 201, 218);
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+}

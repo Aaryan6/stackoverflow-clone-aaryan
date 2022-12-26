@@ -14,7 +14,12 @@ const PostSchema = new mongoose.Schema(
       default: [],
     },
     comments: {
-      type: [],
+      type: [
+        {
+          userId: { type: String },
+          comment: { type: String },
+        },
+      ],
       default: [],
     },
     imageUrl: {

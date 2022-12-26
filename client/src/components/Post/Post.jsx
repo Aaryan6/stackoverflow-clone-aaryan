@@ -4,56 +4,98 @@ import { SlOptions } from "react-icons/sl";
 import { AiOutlineLike, AiFillLike } from "react-icons/ai";
 import { GoComment } from "react-icons/go";
 import { CiShare2 } from "react-icons/ci";
-import NoAvatar from "../../assets/noavatar.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { deletedPost, dislikePost, likePost } from "../../actions/post";
+import {
+  deletedPost,
+  dislikePost,
+  likePost,
+  commentPost,
+} from "../../actions/post";
+import moment from "moment";
+import { IoSend } from "react-icons/io5";
+import Comment from "../Comment/Comment";
+import copy from "copy-to-clipboard";
 
 const Post = ({ post }) => {
   const [user, setUser] = useState({});
   const currentUser = useSelector((state) => state.currentUserReducer);
   const [liked, setLiked] = useState(
-    post.likes.includes(currentUser?.result._id)
+    post?.likes?.includes(currentUser?.result._id)
   );
   const [showOption, setShowOption] = useState(false);
-  const [deleted, setDeleted] = useState(false);
+  const [commentText, setCommentText] = useState();
   const users = useSelector((state) => state.usersReducer);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const url = window.location.href;
 
   useEffect(() => {
     users.filter((u) => u._id === post?.userId && setUser(u));
-  }, [post]);
+  }, [post, users]);
 
-  const setLikePost = (id) => {
-    setLiked(true);
-    dispatch(likePost(id));
+  const setLikePost = () => {
+    if (currentUser) {
+      // setLiked(true);
+      dispatch(likePost(post._id));
+    } else {
+      alert("Please login!");
+    }
   };
 
-  const setdisLikePost = (id) => {
-    setLiked(false);
-    dispatch(dislikePost(id));
+  const setdisLikePost = () => {
+    if (currentUser) {
+      // setLiked(false);
+      dispatch(dislikePost(post._id));
+    } else {
+      alert("Please login!");
+    }
   };
 
-  const deletePost = (id) => {
-    dispatch(deletedPost(id));
-    setDeleted(true);
+  const deletePost = () => {
+    dispatch(deletedPost(post._id));
+    setShowOption(false);
+  };
+
+  const postComment = () => {
+    setCommentText("");
+    if (currentUser) {
+      commentText
+        ? dispatch(commentPost(post._id, commentText))
+        : alert("Type a comment");
+    } else {
+      alert("Please login!");
+    }
+  };
+
+  const navigateToPostPage = () => {
+    navigate(`/stackoverflow-community/post/${post._id}`);
+    setShowOption(false);
+  };
+
+  const handleShare = () => {
+    copy(url);
+    alert("Copied url : " + url);
+    setShowOption(false);
   };
 
   return (
-    <div className="post-container" style={{ display: deleted && "none" }}>
+    <div className="post-container">
       <div className="header">
         <div className="left-header">
-          <img src={NoAvatar} alt="profile" />
+          <Link to={`/Users/${user?._id}`} style={{ textDecoration: "none" }}>
+            <div className="avatar">{user?.name?.charAt(0).toUpperCase()}</div>
+          </Link>
           <div className="text">
             <span>
               <Link
-                to={`/profile/`}
+                to={`/Users/${user?._id}`}
                 style={{ textDecoration: "none", color: "inherit" }}
               >
                 {user?.name}
               </Link>
             </span>
-            <span>5 days ago</span>
+            <span>{moment(post?.updatedAt).fromNow()}</span>
           </div>
         </div>
         {/* --- delete option --- */}
@@ -62,9 +104,13 @@ const Post = ({ post }) => {
             onClick={() => setShowOption(!showOption)}
             style={{ cursor: "pointer", marginRight: "5px" }}
           />
-          {post.userId === currentUser?.result._id && showOption && (
+          {showOption && (
             <div className="option_box">
-              <span onClick={() => deletePost(post._id)}>Delete</span>
+              {post.userId === currentUser?.result._id && (
+                <span onClick={deletePost}>Delete</span>
+              )}
+              <span onClick={navigateToPostPage}>Go to Post</span>
+              <span onClick={handleShare}>Share to</span>
             </div>
           )}
         </div>
@@ -91,16 +137,36 @@ const Post = ({ post }) => {
         )}
       </div>
       <div className="footer">
-        {liked ? (
-          <AiFillLike
-            className="like-button"
-            onClick={() => setdisLikePost(post._id)}
+        <div className="buttons">
+          {post?.likes?.includes(currentUser?.result._id) ? (
+            <AiFillLike className="like-button" onClick={setdisLikePost} />
+          ) : (
+            <AiOutlineLike onClick={setLikePost} />
+          )}
+          <GoComment onClick={navigateToPostPage} />
+          <CiShare2 onClick={handleShare} />
+        </div>
+      </div>
+      <div className="comment-box">
+        <div className="add-comment">
+          <input
+            type="text"
+            placeholder="Add a comment..."
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
           />
-        ) : (
-          <AiOutlineLike onClick={() => setLikePost(post._id)} />
-        )}
-        <GoComment />
-        <CiShare2 />
+          <button onClick={postComment}>
+            <IoSend className="send-button" />
+          </button>
+        </div>
+        <div className="post-comments">
+          {post.comments?.length === 0 && (
+            <p style={{ fontSize: "14px", padding: "0 10px" }}>No comments</p>
+          )}
+          {post.comments?.map((comment) => {
+            return <Comment comment={comment} key={comment._id} />;
+          })}
+        </div>
       </div>
     </div>
   );

@@ -93,10 +93,6 @@ const Navbar = () => {
                   <CgProfile />
                 </div>
               </Link>
-              <div onClick={() => setProfileDropdown(false)}>
-                <span>Add Post</span>
-                <GrAddCircle />
-              </div>
               <div onClick={handleLogout}>
                 <span>Sign Out</span>
                 <IoMdLogOut />

@@ -63,6 +63,10 @@
   font-size: 0.9rem;
   cursor: pointer;
 }
+.active-tab {
+  border-bottom: 2px solid rgb(231, 164, 30);
+  padding: 2px 10px;
+}
 
 .community-container .add-post-button {
   position: fixed;
@@ -77,6 +81,7 @@
   padding: 1rem;
   box-shadow: 0 0 15px -2px #ccc;
   border: 1px solid #ddd;
+  z-index: 300;
 }
 .community-container .add-post-button .add-button {
   font-size: 1.3em;
@@ -105,8 +110,13 @@
 /* model box */
 
 .sharepost-container {
-  max-width: 500px;
+  width: 400px;
   position: relative;
+}
+@media screen and (max-width: 500px) {
+  .sharepost-container {
+    width: 300px;
+  }
 }
 .sharepost-container .close-icon {
   position: absolute;
@@ -121,13 +131,16 @@
 .sharepost-container .wrapper .title {
   text-align: center;
   font-weight: 500;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
+  margin-top: 0;
 }
 .sharepost-container form textarea {
-  width: 100%;
+  width: calc(100% - 20px);
   height: 100px;
+  padding: 10px;
   resize: none;
-  border: 1px solid #ddd;
+  background: rgb(235, 236, 239);
+  border: none;
   border-radius: 5px;
   font-family: Arial, Helvetica, sans-serif;
   outline: none;
@@ -142,14 +155,36 @@
 }
 .sharepost-container form button {
   border: none;
-  background: #f0f0f0;
-  padding: 8px 15px;
+  background: #f19328;
+  padding: 10px 15px;
   font-size: 0.8rem;
   margin-top: 10px;
   cursor: pointer;
+  width: 100%;
+  color: #fff;
 }
-.sharepost-container .share-buttons button {
+.sharepost-container form input {
+  display: none;
+}
+.sharepost-container .share-buttons label {
   margin-right: 5px;
+  background: #f0f0f0;
+  color: #111;
+  padding: 10px 15px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.sharepost-container .share-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sharepost-container .upload-button {
+  margin: 10px 0;
+}
+
+.about-tab {
+  display: none;
 }
 
 @media screen and (max-width: 750px) {
@@ -165,5 +200,8 @@
     flex-basis: 100%;
     max-width: 500px;
     margin: 0;
+  }
+  .about-tab {
+    display: inline;
   }
 }

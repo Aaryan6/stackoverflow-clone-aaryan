@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./SuggestionBox.css";
-import NoAvatar from "../../assets/noavatar.jpg";
 import { fetchAllUsers, followUser, unfollowUser } from "../../actions/users";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
@@ -25,10 +24,10 @@ const MiniProfile = ({ user, currentUserId }) => {
   };
   return (
     <div className="profile" key={user._id}>
-      <Link to={`/profile/${user._id}`} className="image">
-        <img src={user.imageUrl || NoAvatar} alt="" />
+      <Link to={`/Users/${user._id}`} className="image">
+        <div className="avatar">{user?.name?.charAt(0).toUpperCase()}</div>
       </Link>
-      <Link to={`/profile/${user._id}`} className="username">
+      <Link to={`/Users/${user._id}`} className="username">
         <span>{user.name}</span>
       </Link>
       {followed ? (

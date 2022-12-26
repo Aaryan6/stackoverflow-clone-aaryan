@@ -21,6 +21,7 @@ export const fetchAllPosts = () => async (dispatch) => {
 export const likePost = (postId) => async (dispatch) => {
   try {
     await api.likePost(postId);
+    dispatch(fetchAllPosts());
   } catch (error) {
     console.log(error);
   }
@@ -29,6 +30,7 @@ export const likePost = (postId) => async (dispatch) => {
 export const dislikePost = (postId) => async (dispatch) => {
   try {
     await api.dislikePost(postId);
+    dispatch(fetchAllPosts());
   } catch (error) {
     console.log(error);
   }
@@ -37,6 +39,16 @@ export const dislikePost = (postId) => async (dispatch) => {
 export const deletedPost = (postId) => async (dispatch) => {
   try {
     await api.deletePost(postId);
+    dispatch(fetchAllPosts());
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const commentPost = (postId, commentText) => async (dispatch) => {
+  try {
+    await api.commentPost(postId, commentText);
+    dispatch(fetchAllPosts());
   } catch (error) {
     console.log(error);
   }
