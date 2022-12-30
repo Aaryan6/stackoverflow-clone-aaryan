@@ -20,15 +20,11 @@ import copy from "copy-to-clipboard";
 const Post = ({ post }) => {
   const [user, setUser] = useState({});
   const currentUser = useSelector((state) => state.currentUserReducer);
-  const [liked, setLiked] = useState(
-    post?.likes?.includes(currentUser?.result._id)
-  );
   const [showOption, setShowOption] = useState(false);
   const [commentText, setCommentText] = useState();
   const users = useSelector((state) => state.usersReducer);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const url = window.location.href;
 
   useEffect(() => {
     users.filter((u) => u._id === post?.userId && setUser(u));
@@ -36,7 +32,6 @@ const Post = ({ post }) => {
 
   const setLikePost = () => {
     if (currentUser) {
-      // setLiked(true);
       dispatch(likePost(post._id));
     } else {
       alert("Please login!");
@@ -45,7 +40,6 @@ const Post = ({ post }) => {
 
   const setdisLikePost = () => {
     if (currentUser) {
-      // setLiked(false);
       dispatch(dislikePost(post._id));
     } else {
       alert("Please login!");
@@ -74,6 +68,8 @@ const Post = ({ post }) => {
   };
 
   const handleShare = () => {
+    const url =
+      window.location.origin + "/stackoverflow-community/post/" + post._id;
     copy(url);
     alert("Copied url : " + url);
     setShowOption(false);
@@ -95,7 +91,7 @@ const Post = ({ post }) => {
                 {user?.name}
               </Link>
             </span>
-            <span>{moment(post?.updatedAt).fromNow()}</span>
+            <span>{moment(post?.createdAt).fromNow()}</span>
           </div>
         </div>
         {/* --- delete option --- */}
@@ -138,11 +134,14 @@ const Post = ({ post }) => {
       </div>
       <div className="footer">
         <div className="buttons">
-          {post?.likes?.includes(currentUser?.result._id) ? (
-            <AiFillLike className="like-button" onClick={setdisLikePost} />
-          ) : (
-            <AiOutlineLike onClick={setLikePost} />
-          )}
+          <div className="" style={{ display: "flex", alignItems: "center" }}>
+            {post?.likes?.includes(currentUser?.result._id) ? (
+              <AiFillLike className="like-button" onClick={setdisLikePost} />
+            ) : (
+              <AiOutlineLike onClick={setLikePost} />
+            )}
+            <span style={{ marginLeft: "2px" }}>{post.likes.length}</span>
+          </div>
           <GoComment onClick={navigateToPostPage} />
           <CiShare2 onClick={handleShare} />
         </div>

@@ -3,8 +3,6 @@
   padding: 1rem 1.5rem;
   margin-top: 10px;
   border-radius: 10px;
-  height: 245px;
-  overflow: hidden;
 }
 .side-box .title {
   font-weight: 500;
@@ -61,4 +59,19 @@
   margin: 0;
   color: #fff;
   cursor: pointer;
+}
+
+.side-box .user-searchbar {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  display: flex;
+}
+.side-box .user-searchbar input {
+  flex: 1;
+  border: 1px solid rgb(160, 160, 160);
+  padding-left: 28px;
+}
+.side-box .user-searchbar .search-icon {
+  top: 6px;
 }
