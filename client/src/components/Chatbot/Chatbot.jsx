@@ -18,7 +18,7 @@ const Chatbot = ({ setBotIsOpen }) => {
   const [typing, setTyping] = useState(false);
 
   const configuration = new Configuration({
-    apiKey: "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",
+    apiKey: process.env.OpenAIApiKey,
   });
   const openai = new OpenAIApi(configuration);
 
